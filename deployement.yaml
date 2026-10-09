@@ -1,0 +1,29 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bike-website
+  labels:
+    app: bike-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bike-website
+  template:
+    metadata:
+      labels:
+        app: bike-website
+    spec:
+      containers:
+        - name: bike-website
+          image: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/bike-website:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
