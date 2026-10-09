@@ -1,7 +1,7 @@
 pipeline {
-    agent any
+agent any
 
-    stages {
+stages {
     stage('Checkout Code') {
         steps {
             git branch: 'main',
@@ -12,6 +12,7 @@ pipeline {
     stage('Check Files') {
         steps {
             sh '''
+                echo "Checking project files..."
                 pwd
                 ls -la
                 test -f Dockerfile
@@ -21,9 +22,19 @@ pipeline {
         }
     }
 
+    stage('Pull Nginx Image') {
+        steps {
+            retry(3) {
+                sh 'docker pull nginx:latest'
+            }
+        }
+    }
+
     stage('Build Docker Image') {
         steps {
-            sh 'docker build -t bike-website:latest .'
+            sh '''
+                docker build --pull=false -t bike-website:latest .
+            '''
         }
     }
 
@@ -31,14 +42,31 @@ pipeline {
         steps {
             sh '''
                 docker rm -f bike-website || true
-                docker run -d --name bike-website \
+
+                docker run -d \
+                    --name bike-website \
+                    -p 8081:80 \
                     --restart unless-stopped \
-                    -p 8081:80 bike-website:latest
-                sleep 3
-                curl --fail http://localhost:8081/
+                    bike-website:latest
+
+                echo "Website deployed successfully"
             '''
         }
     }
 }
 
-}    
+post {
+    success {
+        echo 'Pipeline completed successfully!'
+    }
+
+    failure {
+        echo 'Pipeline failed. Check the Jenkins console output.'
+    }
+
+    always {
+        echo 'Pipeline execution finished.'
+    }
+}
+
+}
