@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: bike-website
-          image: YOUR_AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/bike-website:latest
+          image: 570814275564.dkr.ecr.ap-south-1.amazonaws.com/bike-website:latest
           ports:
             - containerPort: 80
           resources:
